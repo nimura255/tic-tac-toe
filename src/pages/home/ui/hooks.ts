@@ -10,7 +10,7 @@ export function useHomePageForm() {
   const [circlesUserNameError, setCirclesUserNameError] = useState('');
 
   const { setScreen } = useRouterState();
-  const setNamesToStore = useGameStore(useShallow((state) => state.setNames));
+  const startGame = useGameStore(useShallow((state) => state.startGame));
 
   const handleSubmit = useCallback(
     (event: FormEvent) => {
@@ -28,14 +28,14 @@ export function useHomePageForm() {
       }
 
       if (circlesUserName.trim() && crossesUserName.trim()) {
-        setNamesToStore({
+        startGame({
           crosses: trimmedCrosses,
           circles: trimmedCircles,
         });
         setScreen('game');
       }
     },
-    [circlesUserName, crossesUserName, setNamesToStore, setScreen],
+    [circlesUserName, crossesUserName, startGame, setScreen],
   );
 
   return {

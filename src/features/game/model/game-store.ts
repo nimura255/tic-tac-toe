@@ -8,7 +8,97 @@ type GameStoreState = {
   };
   turn: 'crosses' | 'circles';
   board: ('crosses' | 'circles')[][];
+  winner: 'crosses' | 'circles' | null;
 };
+
+const possibleIntervals = [
+  {
+    fromRow: -4,
+    toRow: 0,
+    fromCol: 0,
+    toCol: 0,
+  },
+  {
+    fromRow: 0,
+    toRow: 4,
+    fromCol: 0,
+    toCol: 0,
+  },
+  {
+    fromRow: 0,
+    toRow: 0,
+    fromCol: -4,
+    toCol: 0,
+  },
+  {
+    fromRow: 0,
+    toRow: 0,
+    fromCol: 0,
+    toCol: 4,
+  },
+  {
+    fromRow: -4,
+    toRow: 0,
+    fromCol: -4,
+    toCol: 0,
+  },
+  {
+    fromRow: 0,
+    toRow: 4,
+    fromCol: 0,
+    toCol: 4,
+  },
+
+  {
+    fromRow: 4,
+    toRow: 0,
+    fromCol: -4,
+    toCol: 0,
+  },
+  {
+    fromRow: 0,
+    toRow: -4,
+    fromCol: 0,
+    toCol: 4,
+  },
+];
+
+function findEndgameSequence(params: {
+  row: number;
+  column: number;
+  board: ('crosses' | 'circles')[][];
+}): boolean {
+  const { row, board, column } = params;
+  const kind = board[row]?.[column];
+
+  for (const interval of possibleIntervals) {
+    let currentRow = interval.fromRow + row;
+    let currentColumn = interval.fromCol + column;
+
+    const lastRow = interval.toRow + row;
+    const lastColumn = interval.toCol + column;
+
+    const rowIncrement = interval.fromRow < interval.toRow ? 1 : -1;
+    const colIncrement = interval.fromCol < interval.toCol ? 1 : -1;
+
+    while (currentRow !== lastRow && currentColumn !== lastColumn) {
+      const cell = board[currentRow]?.[currentColumn];
+
+      if (cell !== kind) {
+        break;
+      }
+
+      currentRow += rowIncrement;
+      currentColumn += colIncrement;
+    }
+
+    if (currentRow === lastRow && currentColumn === lastColumn) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 export const useGameStore = create(
   combine(
@@ -19,18 +109,30 @@ export const useGameStore = create(
       },
       turn: 'crosses',
       board: [],
+      winner: null,
     } as GameStoreState,
     (set) => ({
-      setNames: ({
+      startGame: ({
         crosses,
         circles,
       }: {
         crosses: string;
         circles: string;
       }) => {
-        set({
+        set(() => ({
           users: { crosses, circles },
-        });
+          turn: 'crosses',
+          board: [],
+          winner: null,
+        }));
+      },
+      restart: () => {
+        set(({ users }) => ({
+          users: users,
+          turn: 'crosses',
+          board: [],
+          winner: null,
+        }));
       },
       markCell: (params: { row: number; column: number }) => {
         const { column, row } = params;
@@ -43,10 +145,17 @@ export const useGameStore = create(
           rowArray[column] = turn;
           newBoard[row] = rowArray;
 
+          const isGameOver = findEndgameSequence({
+            row,
+            column,
+            board: newBoard,
+          });
+
           return {
             ...state,
             turn: turn === 'circles' ? 'crosses' : 'circles',
             board: newBoard,
+            winner: isGameOver ? turn : undefined,
           };
         });
       },
