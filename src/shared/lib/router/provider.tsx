@@ -3,7 +3,7 @@ import type { ScreenType } from '$shared/lib/router/types.ts';
 import { RouterContext } from '$shared/lib/router/context.tsx';
 
 export function RouterContextProvider({ children }: { children: ReactNode }) {
-  const [screen, setScreen] = useState<ScreenType>('home');
+  const [screen, setScreen] = useState<ScreenType>('game');
   const contextValue = useMemo(
     () => ({
       screen,

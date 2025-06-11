@@ -1,6 +1,7 @@
 import { useState, useCallback, type FormEvent } from 'react';
 import { useRouterState } from '$shared/lib/router';
-import { useCurrentGameStore } from '$shared/stores/current-game';
+import { useGameStore } from '$features/game';
+import { useShallow } from 'zustand/react/shallow';
 
 export function useHomePageForm() {
   const [crossesUserName, setCrossesUserName] = useState('');
@@ -9,7 +10,7 @@ export function useHomePageForm() {
   const [circlesUserNameError, setCirclesUserNameError] = useState('');
 
   const { setScreen } = useRouterState();
-  const setNamesToStore = useCurrentGameStore((state) => state.setNames);
+  const setNamesToStore = useGameStore(useShallow((state) => state.setNames));
 
   const handleSubmit = useCallback(
     (event: FormEvent) => {
