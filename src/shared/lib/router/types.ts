@@ -1,4 +1,4 @@
-export type ScreenType = 'home' | 'game' | 'history';
+export type ScreenType = 'home' | 'game' | 'history' | 'game-review';
 
 export type RouterContextType = {
   screen: ScreenType;

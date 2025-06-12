@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { combine } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
 
-type GameStoreState = {
+type GameStoreStateType = {
   users: {
     circles: string;
     crosses: string;
@@ -10,6 +10,24 @@ type GameStoreState = {
   board: ('crosses' | 'circles')[][];
   winner: 'crosses' | 'circles' | null;
 };
+
+type SetGameStatePayloadType = {
+  users: {
+    circles: string;
+    crosses: string;
+  };
+  board: ('crosses' | 'circles')[][];
+};
+
+type GameStoreActionsType = {
+  startGame(payload: { crosses: string; circles: string }): void;
+  restart(): void;
+  exitGame(): void;
+  markCell(params: { row: number; column: number }): void;
+  setGameState(payload: SetGameStatePayloadType): void;
+};
+
+type GameStoreType = GameStoreStateType & GameStoreActionsType;
 
 const possibleIntervals = [
   {
@@ -132,65 +150,74 @@ function findEndgameSequence(params: {
   return false;
 }
 
-export const useGameStore = create(
-  combine(
-    {
-      users: {
-        circles: 'user1',
-        crosses: 'user2',
-      },
-      turn: 'crosses',
-      board: [],
-      winner: null,
-    } as GameStoreState,
-    (set) => ({
-      startGame: ({
-        crosses,
-        circles,
-      }: {
-        crosses: string;
-        circles: string;
-      }) => {
-        set(() => ({
-          users: { crosses, circles },
-          turn: 'crosses',
-          board: [],
-          winner: null,
-        }));
-      },
-      restart: () => {
-        set(({ users }) => ({
-          users: users,
-          turn: 'crosses',
-          board: [],
-          winner: null,
-        }));
-      },
-      markCell: (params: { row: number; column: number }) => {
-        const { column, row } = params;
+export const useGameStore = create<GameStoreType>()(
+  subscribeWithSelector((set) => ({
+    users: {
+      circles: 'user1',
+      crosses: 'user2',
+    },
+    turn: 'crosses',
+    board: [],
+    winner: null,
+    startGame: ({ crosses, circles }: { crosses: string; circles: string }) => {
+      set(() => ({
+        users: { crosses, circles },
+        turn: 'crosses',
+        board: [],
+        winner: null,
+      }));
+    },
+    restart: () => {
+      set(({ users }) => ({
+        users: users,
+        turn: 'crosses',
+        board: [],
+        winner: null,
+      }));
+    },
+    setGameState: (payload) => {
+      set((state) => ({
+        ...state,
+        users: payload.users,
+        board: payload.board,
+      }));
+    },
+    exitGame: () => {
+      set((state) => ({
+        ...state,
+        users: {
+          circles: '',
+          crosses: '',
+        },
+        turn: 'crosses',
+        board: [],
+        winner: null,
+      }));
+    },
+    markCell: (params: { row: number; column: number }) => {
+      const { column, row } = params;
 
-        set((state) => {
-          const newBoard = [...state.board];
-          const rowArray = [...(newBoard[row] || [])];
-          const { turn } = state;
+      set((state) => {
+        const newBoard = [...state.board];
+        const rowArray = [...(newBoard[row] || [])];
+        const { turn } = state;
 
-          rowArray[column] = turn;
-          newBoard[row] = rowArray;
+        rowArray[column] = turn;
+        newBoard[row] = rowArray;
 
-          const isGameOver = findEndgameSequence({
-            row,
-            column,
-            board: newBoard,
-          });
-
-          return {
-            ...state,
-            turn: turn === 'circles' ? 'crosses' : 'circles',
-            board: newBoard,
-            winner: isGameOver ? turn : undefined,
-          };
+        const isGameOver = findEndgameSequence({
+          row,
+          column,
+          board: newBoard,
         });
-      },
-    }),
-  ),
+
+        return {
+          ...state,
+          turn: turn === 'circles' ? 'crosses' : 'circles',
+          board: newBoard,
+          winner: isGameOver ? turn : null,
+        };
+      });
+    },
+  })),
 );

@@ -1,6 +1,9 @@
+import { useCallback, useEffect } from 'react';
 import { Box, Button, Typography, Modal } from '@mui/material';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore, Board, FigureIcon } from '$features/game';
+import { useHistoryStore } from '$features/history';
+import { useRouterState } from '$shared/lib/router';
 
 const modaStyle = {
   position: 'absolute',
@@ -14,20 +17,40 @@ const modaStyle = {
   p: 4,
 };
 
+function useExitGame() {
+  const { setScreen } = useRouterState();
+
+  return useCallback(() => {
+    useGameStore.getState().exitGame();
+    setScreen('home');
+  }, [setScreen]);
+}
+
 function GameHeader() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const turn = useGameStore(useShallow((state) => state.turn));
+  const exitGame = useExitGame();
 
   return (
     <Box
       sx={{
-        display: 'flex',
-        justifyContent: 'center',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
         alignItems: 'center',
+        justifyItems: 'start',
         pt: '15px',
+        px: '15px',
       }}
     >
-      <Box sx={{ display: 'flex', gap: '5px', '&>svg': { width: '24px' } }}>
+      <Button onClick={exitGame}>Exit</Button>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '5px',
+          justifySelf: 'center',
+          '&>svg': { width: '24px' },
+        }}
+      >
         <FigureIcon type={turn} />
         <Typography variant="h5" sx={{ textAlign: 'center' }}>
           {usersNames[turn]}'s turn
@@ -41,6 +64,30 @@ export function GamePage() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const winner = useGameStore(useShallow((state) => state.winner));
   const restart = useGameStore(useShallow((state) => state.restart));
+  const exitGame = useExitGame();
+
+  useEffect(() => {
+    const unsubscribe = useGameStore.subscribe(
+      (state) => state.winner,
+      (winner) => {
+        if (!winner) {
+          return;
+        }
+
+        const currentGameState = useGameStore.getState();
+
+        useHistoryStore.getState().addToHistory({
+          userNames: currentGameState.users,
+          winner: currentGameState.winner!,
+          board: currentGameState.board,
+        });
+      },
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <Box
@@ -66,7 +113,14 @@ export function GamePage() {
       <Modal open={Boolean(winner)}>
         <Box sx={modaStyle}>
           <Typography>{usersNames[winner!]} won</Typography>
-          <Button onClick={restart}>Restart</Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <Button onClick={restart} variant="contained">
+              Restart
+            </Button>
+            <Button onClick={exitGame} variant="contained">
+              Exit
+            </Button>
+          </Box>
         </Box>
       </Modal>
     </Box>

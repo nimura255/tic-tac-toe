@@ -12,7 +12,6 @@ const BoardCell = memo(({ row, column }: { row: number; column: number }) => {
   return (
     <Box
       sx={{
-        cursor: 'pointer',
         background: 'white',
         height: CELL_SIZE,
         width: CELL_SIZE,
@@ -37,10 +36,14 @@ function renderCells() {
   return cells;
 }
 
-export const Board = memo(() => {
+export const Board = memo(({ readonly }: { readonly?: boolean }) => {
   const markCell = useGameStore(useShallow((state) => state.markCell));
 
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (readonly) {
+      return;
+    }
+
     const target = event.target as HTMLDivElement;
     const { row, column } = target.dataset;
 
@@ -66,6 +69,9 @@ export const Board = memo(() => {
         boxSizing: 'border-box',
         gridTemplateColumns: `repeat(${BOARD_WIDTH}, ${CELL_SIZE})`,
         gap: GRID_GAP,
+        '& > div': {
+          cursor: readonly ? 'default' : 'pointer',
+        },
       }}
     >
       {renderCells()}

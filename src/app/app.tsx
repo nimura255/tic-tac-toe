@@ -4,6 +4,7 @@ import { HomePage } from '$pages/home';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterContextProvider, useRouterState } from '$shared/lib/router';
+import { GameReviewPage } from '$pages/game-review';
 import './ui/main.css';
 
 export function App() {
@@ -14,6 +15,8 @@ export function App() {
       return <GamePage />;
     case 'history':
       return <HistoryPage />;
+    case 'game-review':
+      return <GameReviewPage />;
     case 'home':
     default:
       return <HomePage />;
