@@ -63,6 +63,30 @@ const possibleIntervals = [
   },
 ];
 
+function selectIncrement(from: number, to: number) {
+  if (from < to) {
+    return 1;
+  }
+
+  if (from > to) {
+    return -1;
+  }
+
+  return 0;
+}
+
+function checkIntervalCondition(from: number, to: number, current: number) {
+  if (from < to) {
+    return current <= to;
+  }
+
+  if (from > to) {
+    return current >= to;
+  }
+
+  return current === to;
+}
+
 function findEndgameSequence(params: {
   row: number;
   column: number;
@@ -72,27 +96,35 @@ function findEndgameSequence(params: {
   const kind = board[row]?.[column];
 
   for (const interval of possibleIntervals) {
-    let currentRow = interval.fromRow + row;
-    let currentColumn = interval.fromCol + column;
-
+    const firstRow = interval.fromRow + row;
+    const firstColumn = interval.fromCol + column;
     const lastRow = interval.toRow + row;
     const lastColumn = interval.toCol + column;
 
-    const rowIncrement = interval.fromRow < interval.toRow ? 1 : -1;
-    const colIncrement = interval.fromCol < interval.toCol ? 1 : -1;
+    let currentRow = firstRow;
+    let currentColumn = firstColumn;
 
-    while (currentRow !== lastRow && currentColumn !== lastColumn) {
+    const rowIncrement = selectIncrement(interval.fromRow, interval.toRow);
+    const colIncrement = selectIncrement(interval.fromCol, interval.toCol);
+
+    let cellsCounter = 0;
+
+    while (
+      checkIntervalCondition(firstRow, lastRow, currentRow) &&
+      checkIntervalCondition(firstColumn, lastColumn, currentColumn)
+    ) {
       const cell = board[currentRow]?.[currentColumn];
 
       if (cell !== kind) {
         break;
       }
 
+      cellsCounter++;
       currentRow += rowIncrement;
       currentColumn += colIncrement;
     }
 
-    if (currentRow === lastRow && currentColumn === lastColumn) {
+    if (cellsCounter === 5) {
       return true;
     }
   }
