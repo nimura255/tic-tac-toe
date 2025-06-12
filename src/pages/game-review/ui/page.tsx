@@ -1,18 +1,17 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useRouterState } from '$shared/lib/router';
+import { useScreenStore } from '$shared/lib/router';
 import { Board, useGameStore } from '$features/game';
 import { useShallow } from 'zustand/react/shallow';
 
-function Header() {
-  const { setScreen } = useRouterState();
-  const usersNames = useGameStore(useShallow((state) => state.users));
+function goHome() {
+  useGameStore.getState().exitGame();
+  useScreenStore.getState().setScreen('history');
+}
 
-  const goHome = () => {
-    useGameStore.getState().exitGame();
-    setScreen('history');
-  };
+function Header() {
+  const usersNames = useGameStore(useShallow((state) => state.users));
 
   return (
     <Box

@@ -5,7 +5,8 @@ import Typography from '@mui/material/Typography';
 import { RegularPageLayout } from '$shared/ui/regularPageLayout';
 import { useStartPvpPageForm } from './hooks';
 import { RegularPageHeader } from '$shared/ui/regularPageHeader.tsx';
-import { useRouterState } from '$shared/lib/router';
+import { useScreenStore } from '$shared/lib/router';
+import { useShallow } from 'zustand/react/shallow';
 
 export function StartPvpPage() {
   const {
@@ -17,7 +18,7 @@ export function StartPvpPage() {
     circlesUserNameError,
     handleSubmit,
   } = useStartPvpPageForm();
-  const { setScreen } = useRouterState();
+  const setScreen = useScreenStore(useShallow((state) => state.setScreen));
 
   return (
     <RegularPageLayout>

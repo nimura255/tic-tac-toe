@@ -3,13 +3,13 @@ import { HistoryPage } from '$pages/history';
 import { HomePage } from '$pages/home';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { RouterContextProvider, useRouterState } from '$shared/lib/router';
+import { useScreenStore } from '$shared/lib/router';
 import { GameReviewPage } from '$pages/game-review';
 import { StartPvpPage } from '$pages/start-pvp';
 import './ui/main.css';
 
 export function App() {
-  const { screen } = useRouterState();
+  const { screen } = useScreenStore();
 
   switch (screen) {
     case 'game':
@@ -28,8 +28,6 @@ export function App() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterContextProvider>
-      <App />
-    </RouterContextProvider>
+    <App />
   </StrictMode>,
 );

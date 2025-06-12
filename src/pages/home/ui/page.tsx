@@ -1,11 +1,12 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useRouterState } from '$shared/lib/router';
+import { useShallow } from 'zustand/react/shallow';
+import { useScreenStore } from '$shared/lib/router';
 import { RegularPageLayout } from '$shared/ui/regularPageLayout';
 
 export function HomePage() {
-  const { setScreen } = useRouterState();
+  const setScreen = useScreenStore(useShallow((state) => state.setScreen));
 
   return (
     <RegularPageLayout>

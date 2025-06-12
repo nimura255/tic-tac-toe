@@ -8,13 +8,14 @@ import Typography from '@mui/material/Typography';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '$features/game';
 import { useHistoryStore } from '$features/history';
-import { useRouterState } from '$shared/lib/router';
+import { useScreenStore } from '$shared/lib/router';
 import { RegularPageLayout } from '$shared/ui/regularPageLayout';
 import { RegularPageHeader } from '$shared/ui/regularPageHeader.tsx';
 
 export function HistoryPage() {
   const records = useHistoryStore(useShallow((state) => state.records));
-  const { setScreen } = useRouterState();
+  const setGameState = useGameStore(useShallow((state) => state.setGameState));
+  const setScreen = useScreenStore(useShallow((state) => state.setScreen));
 
   return (
     <RegularPageLayout>
@@ -37,11 +38,11 @@ export function HistoryPage() {
 
               <Button
                 onClick={() => {
-                  setScreen('game-review');
-                  useGameStore.getState().setGameState({
+                  setGameState({
                     users: record.userNames,
                     board: record.board,
                   });
+                  setScreen('game-review');
                 }}
               >
                 Review

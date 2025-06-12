@@ -1,11 +1,11 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Box, Button, Typography, Modal } from '@mui/material';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore, Board, FigureIcon } from '$features/game';
 import { useHistoryStore } from '$features/history';
-import { useRouterState } from '$shared/lib/router';
+import { useScreenStore } from '$shared/lib/router';
 
-const modaStyle = {
+const modalStyle = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -17,19 +17,14 @@ const modaStyle = {
   p: 4,
 };
 
-function useExitGame() {
-  const { setScreen } = useRouterState();
-
-  return useCallback(() => {
-    useGameStore.getState().exitGame();
-    setScreen('home');
-  }, [setScreen]);
+function exitGame() {
+  useGameStore.getState().exitGame();
+  useScreenStore.getState().setScreen('home');
 }
 
 function GameHeader() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const turn = useGameStore(useShallow((state) => state.turn));
-  const exitGame = useExitGame();
 
   return (
     <Box
@@ -64,7 +59,6 @@ export function GamePage() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const winner = useGameStore(useShallow((state) => state.winner));
   const restart = useGameStore(useShallow((state) => state.restart));
-  const exitGame = useExitGame();
 
   useEffect(() => {
     const unsubscribe = useGameStore.subscribe(
@@ -111,7 +105,7 @@ export function GamePage() {
         <Board />
       </Box>
       <Modal open={Boolean(winner)}>
-        <Box sx={modaStyle}>
+        <Box sx={modalStyle}>
           <Typography>{usersNames[winner!]} won</Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Button onClick={restart} variant="contained">
