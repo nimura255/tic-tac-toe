@@ -11,7 +11,7 @@ function Header() {
 
   const goHome = () => {
     useGameStore.getState().exitGame();
-    setScreen('home');
+    setScreen('history');
   };
 
   return (
@@ -25,7 +25,7 @@ function Header() {
         px: '15px',
       }}
     >
-      <Button onClick={goHome}>Go Home</Button>
+      <Button onClick={goHome}>Go back</Button>
       <Typography variant="h5" sx={{ justifySelf: 'center' }}>
         {usersNames.circles} vs {usersNames.crosses}
       </Typography>

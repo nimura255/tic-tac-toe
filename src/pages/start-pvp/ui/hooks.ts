@@ -3,7 +3,7 @@ import { useRouterState } from '$shared/lib/router';
 import { useGameStore } from '$features/game';
 import { useShallow } from 'zustand/react/shallow';
 
-export function useHomePageForm() {
+export function useStartPvpPageForm() {
   const [crossesUserName, setCrossesUserName] = useState('');
   const [crossesUserNameError, setCrossesUserNameError] = useState('');
   const [circlesUserName, setCirclesUserName] = useState('');
