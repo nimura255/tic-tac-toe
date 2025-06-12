@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
 import { useShallow } from 'zustand/react/shallow';
+import { FigureIcon } from '$features/game';
 import { useScreenStore } from '$shared/lib/router';
 import { RegularPageLayout } from '$shared/ui/regularPageLayout';
 
@@ -10,13 +10,12 @@ export function HomePage() {
 
   return (
     <RegularPageLayout>
-      <Typography
-        variant="h5"
-        component="h1"
-        sx={{ textAlign: 'center', fontWeight: 500, pb: '20px' }}
-      >
-        Tic-tac-toe
-      </Typography>
+      <Box sx={{ alignSelf: 'center', pb: '20px', '&>*': { width: '50px' } }}>
+        <FigureIcon type="crosses" />
+        <FigureIcon type="circles" />
+        <FigureIcon type="crosses" />
+        <FigureIcon type="circles" />
+      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         <Button variant="contained" onClick={() => setScreen('start-pvp')}>
           Player vs Player match
