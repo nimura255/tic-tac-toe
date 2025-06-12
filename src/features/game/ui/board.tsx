@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useGameStore } from '$features/game';
 import { BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE, GRID_GAP } from '../config';
 import { useShallow } from 'zustand/react/shallow';
+import { FigureIcon } from '$features/game';
 
 const BoardCell = memo(({ row, column }: { row: number; column: number }) => {
   const value = useGameStore(useShallow((state) => state.board[row]?.[column]));
@@ -19,7 +20,7 @@ const BoardCell = memo(({ row, column }: { row: number; column: number }) => {
       data-row={row}
       data-column={column}
     >
-      {value === 'crosses' ? 'X' : value === 'circles' ? 'O' : ''}
+      <FigureIcon type={value} />
     </Box>
   );
 });

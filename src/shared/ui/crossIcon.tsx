@@ -1,0 +1,27 @@
+export function CrossIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <g clipPath="url(#clip0_6_14)">
+        <rect width="14" height="14" fill="white" />
+        <path
+          d="M1.65685 12.6569C1.26633 12.2663 1.26633 11.6332 1.65685 11.2426L11.5563 1.34315C11.9469 0.952622 12.58 0.952622 12.9706 1.34315C13.3611 1.73367 13.3611 2.36684 12.9706 2.75736L3.07107 12.6569C2.68054 13.0474 2.04738 13.0474 1.65685 12.6569Z"
+          fill="currentColor"
+        />
+        <path
+          d="M12.9706 12.6569C12.58 13.0474 11.9469 13.0474 11.5563 12.6569L1.65685 2.75736C1.26633 2.36684 1.26633 1.73367 1.65685 1.34315C2.04738 0.952622 2.68054 0.952622 3.07107 1.34315L12.9706 11.2426C13.3611 11.6332 13.3611 12.2663 12.9706 12.6569Z"
+          fill="currentColor"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_6_14">
+          <rect width="14" height="14" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}

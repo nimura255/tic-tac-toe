@@ -1,6 +1,6 @@
 import { Box, Button, Typography, Modal } from '@mui/material';
 import { useShallow } from 'zustand/react/shallow';
-import { useGameStore, Board } from '$features/game';
+import { useGameStore, Board, FigureIcon } from '$features/game';
 
 const modaStyle = {
   position: 'absolute',
@@ -14,9 +14,31 @@ const modaStyle = {
   p: 4,
 };
 
-export function GamePage() {
+function GameHeader() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const turn = useGameStore(useShallow((state) => state.turn));
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        pt: '15px',
+      }}
+    >
+      <Box sx={{ display: 'flex', gap: '5px', '&>svg': { width: '24px' } }}>
+        <FigureIcon type={turn} />
+        <Typography variant="h5" sx={{ textAlign: 'center' }}>
+          {usersNames[turn]}'s turn
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
+
+export function GamePage() {
+  const usersNames = useGameStore(useShallow((state) => state.users));
   const winner = useGameStore(useShallow((state) => state.winner));
   const restart = useGameStore(useShallow((state) => state.restart));
 
@@ -30,9 +52,7 @@ export function GamePage() {
         overflow: 'hidden',
       }}
     >
-      <Typography variant="h5" sx={{ textAlign: 'center', pt: '15px' }}>
-        {usersNames[turn]}'s turn
-      </Typography>
+      <GameHeader />
       <Box
         sx={{
           padding: '15px',
