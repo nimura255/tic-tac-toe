@@ -1,6 +1,6 @@
 import { useState, useCallback, type FormEvent } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useGameStore } from '$features/game';
+import { startGame } from '$features/game';
 import { useScreenStore } from '$shared/lib/router';
 
 export function useStartPvpPageForm() {
@@ -10,7 +10,6 @@ export function useStartPvpPageForm() {
   const [circlesUserNameError, setCirclesUserNameError] = useState('');
 
   const setScreen = useScreenStore(useShallow((state) => state.setScreen));
-  const startGame = useGameStore(useShallow((state) => state.startGame));
 
   const handleSubmit = useCallback(
     (event: FormEvent) => {
@@ -35,7 +34,7 @@ export function useStartPvpPageForm() {
         setScreen('game');
       }
     },
-    [circlesUserName, crossesUserName, startGame, setScreen],
+    [circlesUserName, crossesUserName, setScreen],
   );
 
   return {

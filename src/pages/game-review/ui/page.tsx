@@ -2,11 +2,11 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useScreenStore } from '$shared/lib/router';
-import { Board, useGameStore } from '$features/game';
+import { Board, useGameStore, exitGame } from '$features/game';
 import { useShallow } from 'zustand/react/shallow';
 
 function goHome() {
-  useGameStore.getState().exitGame();
+  exitGame();
   useScreenStore.getState().setScreen('history');
 }
 

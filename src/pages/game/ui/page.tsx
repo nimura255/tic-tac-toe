@@ -1,8 +1,15 @@
 import { useEffect } from 'react';
 import { Box, Button, Typography, Modal } from '@mui/material';
 import { useShallow } from 'zustand/react/shallow';
-import { useGameStore, Board, FigureIcon } from '$features/game';
-import { useHistoryStore } from '$features/history';
+import {
+  useGameStore,
+  markGameEnd,
+  restartGame,
+  exitGame,
+  Board,
+  FigureIcon,
+} from '$features/game';
+import { addToHistory } from '$features/history';
 import { useScreenStore } from '$shared/lib/router';
 
 const modalStyle = {
@@ -17,8 +24,8 @@ const modalStyle = {
   p: 4,
 };
 
-function exitGame() {
-  useGameStore.getState().exitGame();
+function goToHomeScreen() {
+  exitGame();
   useScreenStore.getState().setScreen('home');
 }
 
@@ -37,7 +44,7 @@ function GameHeader() {
         px: '15px',
       }}
     >
-      <Button onClick={exitGame}>Exit</Button>
+      <Button onClick={goToHomeScreen}>Exit</Button>
       <Box
         sx={{
           display: 'flex',
@@ -58,30 +65,20 @@ function GameHeader() {
 export function GamePage() {
   const usersNames = useGameStore(useShallow((state) => state.users));
   const winner = useGameStore(useShallow((state) => state.winner));
-  const restart = useGameStore(useShallow((state) => state.restart));
 
   useEffect(() => {
-    const unsubscribe = useGameStore.subscribe(
-      (state) => state.winner,
-      (winner) => {
-        if (!winner) {
-          return;
-        }
+    const unsubscribe = markGameEnd.subscribe(() => {
+      const currentGameState = useGameStore.getState();
 
-        const currentGameState = useGameStore.getState();
+      addToHistory({
+        userNames: currentGameState.users,
+        winner: currentGameState.winner!,
+        board: currentGameState.board,
+        endgameSequence: currentGameState.endgameSequence!,
+      });
+    });
 
-        useHistoryStore.getState().addToHistory({
-          userNames: currentGameState.users,
-          winner: currentGameState.winner!,
-          board: currentGameState.board,
-          endgameSequence: currentGameState.endgameSequence!,
-        });
-      },
-    );
-
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -107,12 +104,18 @@ export function GamePage() {
       </Box>
       <Modal open={Boolean(winner)}>
         <Box sx={modalStyle}>
-          <Typography>{usersNames[winner!]} won</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Button onClick={restart} variant="contained">
+          <Typography
+            component="h1"
+            variant="h6"
+            sx={{ textAlign: 'center', pb: '20px' }}
+          >
+            {usersNames[winner!]} won
+          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Button onClick={restartGame} variant="contained">
               Restart
             </Button>
-            <Button onClick={exitGame} variant="contained">
+            <Button onClick={goToHomeScreen} variant="contained">
               Exit
             </Button>
           </Box>

@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -14,40 +13,17 @@ type HistoryRecordType = {
   timestamp: number;
   id: string;
 };
+
 type HistoryStoreStateType = {
   records: HistoryRecordType[];
 };
 
-type AddToHistoryPayloadType = Pick<
-  HistoryRecordType,
-  'userNames' | 'winner' | 'board' | 'endgameSequence'
->;
-
-type HistoryStoreActionsType = {
-  addToHistory(record: AddToHistoryPayloadType): void;
-};
-
-type HistoryStoreType = HistoryStoreStateType & HistoryStoreActionsType;
-
-export const useHistoryStore = create<HistoryStoreType>()(
+export const useHistoryStore = create<HistoryStoreStateType>()(
   persist(
-    (set) => ({
-      records: [],
-      addToHistory: (payload) => {
-        set((state) => {
-          const newRecord = {
-            ...payload,
-            id: nanoid(),
-            timestamp: Date.now(),
-          };
-
-          return {
-            ...state,
-            records: [newRecord, ...state.records.slice(0, 19)],
-          };
-        });
-      },
-    }),
+    () =>
+      ({
+        records: [],
+      }) as HistoryStoreStateType,
     { name: 'tic-tac-toe-history' },
   ),
 );

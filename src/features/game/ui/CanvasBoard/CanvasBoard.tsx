@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useGameStore } from '$features/game';
+import { useGameStore, markCell, startGame } from '$features/game';
 import { Canvas } from './Canvas';
 import { VirtualStage } from './VirtualStage';
 
@@ -36,7 +36,7 @@ export function Board({ readonly }: { readonly?: boolean }) {
       const { indexX, indexY } = virtualStage.getBoardCoords(offsetX, offsetY);
 
       if (indexX !== null && indexY !== null) {
-        useGameStore.getState().markCell({
+        markCell({
           row: indexY,
           column: indexX,
         });
@@ -69,24 +69,17 @@ export function Board({ readonly }: { readonly?: boolean }) {
         requestAnimationFrame(draw);
       },
     );
-
-    const unsubscribeFromEndgameSequence = useGameStore.subscribe(
-      (state) => state.endgameSequence,
-      (endgameSequence) => {
-        if (!endgameSequence?.length) {
-          virtualStage.jumpToCell(0, 0);
-        }
-
-        draw();
-      },
-    );
+    const unsubscribeFromStartGameAction = startGame.subscribe(() => {
+      virtualStage.jumpToCell(0, 0);
+      draw();
+    });
 
     return () => {
       window.removeEventListener('resize', handleResizeEvent);
       canvas.removeEventListener('wheel', handleWheelEvent);
       canvas.removeEventListener('click', handleClickEvent);
       unsubscribeFromBoardState();
-      unsubscribeFromEndgameSequence();
+      unsubscribeFromStartGameAction();
     };
   }, [readonly]);
 

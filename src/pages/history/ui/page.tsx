@@ -6,7 +6,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
 import { useShallow } from 'zustand/react/shallow';
-import { useGameStore } from '$features/game';
+import { setGameState } from '$features/game';
 import { useHistoryStore } from '$features/history';
 import { useScreenStore } from '$shared/lib/router';
 import { RegularPageLayout } from '$shared/ui/regularPageLayout';
@@ -14,7 +14,6 @@ import { RegularPageHeader } from '$shared/ui/regularPageHeader.tsx';
 
 export function HistoryPage() {
   const records = useHistoryStore(useShallow((state) => state.records));
-  const setGameState = useGameStore(useShallow((state) => state.setGameState));
   const setScreen = useScreenStore(useShallow((state) => state.setScreen));
 
   return (
