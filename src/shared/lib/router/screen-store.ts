@@ -13,7 +13,7 @@ type ScreenStoreActionsType = {
 type ScreenStoreType = ScreenStoreStateType & ScreenStoreActionsType;
 
 export const useScreenStore = create<ScreenStoreType>((set) => ({
-  screen: 'home',
+  screen: 'game',
   setScreen: (screen: ScreenType) => {
     set(() => ({
       screen,

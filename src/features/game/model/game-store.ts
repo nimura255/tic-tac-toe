@@ -1,14 +1,17 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
+export type BoardFigureType = 'crosses' | 'circles';
+type BoardType = BoardFigureType[][];
+
 type GameStoreStateType = {
   users: {
     circles: string;
     crosses: string;
   };
-  turn: 'crosses' | 'circles';
-  board: ('crosses' | 'circles')[][];
-  winner: 'crosses' | 'circles' | null;
+  turn: BoardFigureType;
+  board: BoardType;
+  winner: BoardFigureType | null;
 };
 
 type SetGameStatePayloadType = {
@@ -16,7 +19,7 @@ type SetGameStatePayloadType = {
     circles: string;
     crosses: string;
   };
-  board: ('crosses' | 'circles')[][];
+  board: BoardType;
 };
 
 type GameStoreActionsType = {
@@ -108,7 +111,7 @@ function checkIntervalCondition(from: number, to: number, current: number) {
 function findEndgameSequence(params: {
   row: number;
   column: number;
-  board: ('crosses' | 'circles')[][];
+  board: BoardType;
 }): boolean {
   const { row, board, column } = params;
   const kind = board[row]?.[column];
@@ -202,7 +205,10 @@ export const useGameStore = create<GameStoreType>()(
         const rowArray = [...(newBoard[row] || [])];
         const { turn } = state;
 
-        rowArray[column] = turn;
+        if (!rowArray[column]) {
+          rowArray[column] = turn;
+        }
+
         newBoard[row] = rowArray;
 
         const isGameOver = findEndgameSequence({
