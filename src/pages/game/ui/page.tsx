@@ -74,6 +74,7 @@ export function GamePage() {
           userNames: currentGameState.users,
           winner: currentGameState.winner!,
           board: currentGameState.board,
+          endgameSequence: currentGameState.endgameSequence!,
         });
       },
     );

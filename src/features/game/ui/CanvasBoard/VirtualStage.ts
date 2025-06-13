@@ -1,6 +1,6 @@
 import { circleIconPath } from '$shared/ui/circleIcon';
 import { crossIconPath1, crossIconPath2 } from '$shared/ui/crossIcon';
-import type { BoardFigureType } from '$features/game/model/game-store.ts';
+import type { BoardFigureType } from '$features/game/model/types';
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
@@ -20,7 +20,7 @@ export class VirtualStage {
     if (!ctx) throw new Error('Could not get 2D context');
 
     this.ctx = ctx;
-    this.setupHiDPI();
+    this.updateCanvasDimensions();
   }
 
   public draw(board: BoardFigureType[][]) {
@@ -61,11 +61,11 @@ export class VirtualStage {
     }
   }
 
-  getPosition() {
+  public getPosition() {
     return this.position;
   }
 
-  public updatePosition(deltaX: number, deltaY: number) {
+  public setPosition(x: number, y: number) {
     const rect = this.canvas.getBoundingClientRect();
 
     const virtualWidth =
@@ -80,14 +80,28 @@ export class VirtualStage {
     const maxOffsetX = (virtualWidth - rect.width) * -1;
     const maxOffsetY = (virtualHeight - rect.height) * -1;
 
-    this.position.left = Math.min(
-      0,
-      Math.max(this.position.left + deltaX, maxOffsetX),
-    );
-    this.position.top = Math.min(
-      0,
-      Math.max(this.position.top + deltaY, maxOffsetY),
-    );
+    this.position.left = x;
+    this.position.top = y;
+
+    if (this.position.left > 0) {
+      this.position.left = 0;
+    }
+
+    if (this.position.top > 0) {
+      this.position.top = 0;
+    }
+
+    if (this.position.top < maxOffsetY) {
+      this.position.top = maxOffsetY;
+    }
+
+    if (this.position.left < maxOffsetX) {
+      this.position.left = maxOffsetX;
+    }
+  }
+
+  public updatePosition(deltaX: number, deltaY: number) {
+    this.setPosition(this.position.left + deltaX, this.position.top + deltaY);
   }
 
   public getBoardCoords(offsetX: number, offsetY: number) {
@@ -107,7 +121,22 @@ export class VirtualStage {
     };
   }
 
-  private setupHiDPI() {
+  public jumpToCell(indexX: number, indexY: number) {
+    const rect = this.canvas.getBoundingClientRect();
+    const cellsInHalfWidth = Math.trunc(
+      rect.width / (2 * (CELL_SIZE_PX + GRID_GAP_PX)),
+    );
+    const cellsInHalfHeight = Math.trunc(
+      rect.height / (2 * (CELL_SIZE_PX + GRID_GAP_PX)),
+    );
+
+    const coordX = (indexX - cellsInHalfWidth) * (CELL_SIZE_PX + GRID_GAP_PX);
+    const coordY = (indexY - cellsInHalfHeight) * (CELL_SIZE_PX + GRID_GAP_PX);
+
+    this.setPosition(-coordX, -coordY);
+  }
+
+  public updateCanvasDimensions() {
     const dpr = window.devicePixelRatio || 1;
     const rect = this.canvas.getBoundingClientRect();
     this.canvas.width = rect.width * dpr;

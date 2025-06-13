@@ -41,6 +41,8 @@ export function HistoryPage() {
                   setGameState({
                     users: record.userNames,
                     board: record.board,
+                    winner: record.winner,
+                    endgameSequence: [...record.endgameSequence],
                   });
                   setScreen('game-review');
                 }}

@@ -7,8 +7,10 @@ type HistoryRecordType = {
     circles: string;
     crosses: string;
   };
+  // TODO: move this and BoardFigureType to $entities
   winner: 'circles' | 'crosses';
   board: ('circles' | 'crosses')[][];
+  endgameSequence: { row: number; column: number }[];
   timestamp: number;
   id: string;
 };
@@ -18,7 +20,7 @@ type HistoryStoreStateType = {
 
 type AddToHistoryPayloadType = Pick<
   HistoryRecordType,
-  'userNames' | 'winner' | 'board'
+  'userNames' | 'winner' | 'board' | 'endgameSequence'
 >;
 
 type HistoryStoreActionsType = {

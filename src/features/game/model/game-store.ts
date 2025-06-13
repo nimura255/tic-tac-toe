@@ -1,8 +1,7 @@
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-
-export type BoardFigureType = 'crosses' | 'circles';
-type BoardType = BoardFigureType[][];
+import { findEndgameSequence } from './helpers';
+import type { BoardFigureType, BoardType } from './types';
 
 type GameStoreStateType = {
   users: {
@@ -12,6 +11,7 @@ type GameStoreStateType = {
   turn: BoardFigureType;
   board: BoardType;
   winner: BoardFigureType | null;
+  endgameSequence: { row: number; column: number }[] | null;
 };
 
 type SetGameStatePayloadType = {
@@ -20,6 +20,8 @@ type SetGameStatePayloadType = {
     crosses: string;
   };
   board: BoardType;
+  winner: BoardFigureType;
+  endgameSequence: { row: number; column: number }[];
 };
 
 type GameStoreActionsType = {
@@ -32,127 +34,6 @@ type GameStoreActionsType = {
 
 type GameStoreType = GameStoreStateType & GameStoreActionsType;
 
-const possibleIntervals = [
-  {
-    fromRow: -4,
-    toRow: 0,
-    fromCol: 0,
-    toCol: 0,
-  },
-  {
-    fromRow: 0,
-    toRow: 4,
-    fromCol: 0,
-    toCol: 0,
-  },
-  {
-    fromRow: 0,
-    toRow: 0,
-    fromCol: -4,
-    toCol: 0,
-  },
-  {
-    fromRow: 0,
-    toRow: 0,
-    fromCol: 0,
-    toCol: 4,
-  },
-  {
-    fromRow: -4,
-    toRow: 0,
-    fromCol: -4,
-    toCol: 0,
-  },
-  {
-    fromRow: 0,
-    toRow: 4,
-    fromCol: 0,
-    toCol: 4,
-  },
-
-  {
-    fromRow: 4,
-    toRow: 0,
-    fromCol: -4,
-    toCol: 0,
-  },
-  {
-    fromRow: 0,
-    toRow: -4,
-    fromCol: 0,
-    toCol: 4,
-  },
-];
-
-function selectIncrement(from: number, to: number) {
-  if (from < to) {
-    return 1;
-  }
-
-  if (from > to) {
-    return -1;
-  }
-
-  return 0;
-}
-
-function checkIntervalCondition(from: number, to: number, current: number) {
-  if (from < to) {
-    return current <= to;
-  }
-
-  if (from > to) {
-    return current >= to;
-  }
-
-  return current === to;
-}
-
-function findEndgameSequence(params: {
-  row: number;
-  column: number;
-  board: BoardType;
-}): boolean {
-  const { row, board, column } = params;
-  const kind = board[row]?.[column];
-
-  for (const interval of possibleIntervals) {
-    const firstRow = interval.fromRow + row;
-    const firstColumn = interval.fromCol + column;
-    const lastRow = interval.toRow + row;
-    const lastColumn = interval.toCol + column;
-
-    let currentRow = firstRow;
-    let currentColumn = firstColumn;
-
-    const rowIncrement = selectIncrement(interval.fromRow, interval.toRow);
-    const colIncrement = selectIncrement(interval.fromCol, interval.toCol);
-
-    let cellsCounter = 0;
-
-    while (
-      checkIntervalCondition(firstRow, lastRow, currentRow) &&
-      checkIntervalCondition(firstColumn, lastColumn, currentColumn)
-    ) {
-      const cell = board[currentRow]?.[currentColumn];
-
-      if (cell !== kind) {
-        break;
-      }
-
-      cellsCounter++;
-      currentRow += rowIncrement;
-      currentColumn += colIncrement;
-    }
-
-    if (cellsCounter === 5) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 export const useGameStore = create<GameStoreType>()(
   subscribeWithSelector((set) => ({
     users: {
@@ -162,12 +43,14 @@ export const useGameStore = create<GameStoreType>()(
     turn: 'crosses',
     board: [],
     winner: null,
+    endgameSequence: null,
     startGame: ({ crosses, circles }: { crosses: string; circles: string }) => {
       set(() => ({
         users: { crosses, circles },
         turn: 'crosses',
         board: [],
         winner: null,
+        endgameSequence: null,
       }));
     },
     restart: () => {
@@ -176,6 +59,7 @@ export const useGameStore = create<GameStoreType>()(
         turn: 'crosses',
         board: [],
         winner: null,
+        endgameSequence: null,
       }));
     },
     setGameState: (payload) => {
@@ -183,6 +67,7 @@ export const useGameStore = create<GameStoreType>()(
         ...state,
         users: payload.users,
         board: payload.board,
+        endgameSequence: [...payload.endgameSequence],
       }));
     },
     exitGame: () => {
@@ -195,6 +80,7 @@ export const useGameStore = create<GameStoreType>()(
         turn: 'crosses',
         board: [],
         winner: null,
+        endgameSequence: null,
       }));
     },
     markCell: (params: { row: number; column: number }) => {
@@ -211,7 +97,7 @@ export const useGameStore = create<GameStoreType>()(
 
         newBoard[row] = rowArray;
 
-        const isGameOver = findEndgameSequence({
+        const endgameSequence = findEndgameSequence({
           row,
           column,
           board: newBoard,
@@ -221,7 +107,8 @@ export const useGameStore = create<GameStoreType>()(
           ...state,
           turn: turn === 'circles' ? 'crosses' : 'circles',
           board: newBoard,
-          winner: isGameOver ? turn : null,
+          winner: endgameSequence ? turn : null,
+          endgameSequence,
         };
       });
     },
