@@ -1,6 +1,6 @@
-import { circleIconPath } from '$shared/ui/circleIcon';
-import { crossIconPath1, crossIconPath2 } from '$shared/ui/crossIcon';
-import type { BoardFigureType } from '$features/game/model/types';
+import type { BoardFigureType } from '$entities/boardFigure';
+import { circleIconPath } from '$shared/ui/CircleIcon';
+import { crossIconPath1, crossIconPath2 } from '$shared/ui/CrossIcon';
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,

@@ -1,0 +1,1 @@
+export { FigureIcon } from './FigureIcon';

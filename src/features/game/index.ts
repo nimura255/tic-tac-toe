@@ -1,4 +1,4 @@
-export { useGameStore } from './model/game-store';
+export { useGameStore } from './model/gameStore';
 export { Board } from './ui/CanvasBoard';
 export { FigureIcon } from './ui/FigureIcon';
 export {

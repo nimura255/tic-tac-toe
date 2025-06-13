@@ -1,1 +1,1 @@
-export { useScreenStore } from './screen-store';
+export { useScreenStore } from './screenStore';

@@ -1,14 +1,15 @@
 import { nanoid } from 'nanoid';
+import type { BoardFigureType, BoardType } from '$entities/boardFigure';
 import { createSubscribableAction } from '$shared/lib/createSubscribableAction';
-import { useHistoryStore } from './history-store';
+import { useHistoryStore } from './historyStore';
 
 type AddToHistoryPayloadType = {
   userNames: {
     circles: string;
     crosses: string;
   };
-  winner: 'circles' | 'crosses';
-  board: ('circles' | 'crosses')[][];
+  winner: BoardFigureType;
+  board: BoardType;
   endgameSequence: { row: number; column: number }[];
 };
 

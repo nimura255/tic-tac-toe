@@ -1,7 +1,7 @@
+import type { BoardFigureType, BoardType } from '$entities/boardFigure';
 import { useGameStore } from '$features/game';
 import { createSubscribableAction } from '$shared/lib/createSubscribableAction';
 import { findEndgameSequence } from './helpers.ts';
-import type { BoardFigureType, BoardType } from './types';
 
 type StartGamePayloadType = {
   crosses: string;

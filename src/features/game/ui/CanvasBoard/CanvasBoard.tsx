@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useGameStore, markCell, startGame } from '$features/game';
-import { Canvas } from './Canvas';
+import { Canvas } from './styled';
 import { VirtualStage } from './VirtualStage';
 
 export function Board({ readonly }: { readonly?: boolean }) {

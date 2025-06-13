@@ -1,4 +1,4 @@
-import type { BoardType } from './types';
+import type { BoardType } from '$entities/boardFigure';
 
 const possibleIntervals = [
   {

@@ -1,0 +1,1 @@
+export { RegularPageLayout } from './RegularPageLayout';

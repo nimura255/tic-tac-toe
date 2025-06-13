@@ -1,0 +1,1 @@
+export { CurrentPlayerTitle } from './CurrentPlayerTitle';
