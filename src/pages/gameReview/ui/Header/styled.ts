@@ -15,6 +15,7 @@ export const TitleContainer = styled(Typography)`
   display: flex;
   gap: 5px;
   justify-self: center;
+  justify-content: center;
   width: 100%;
   overflow: hidden;
 `;
