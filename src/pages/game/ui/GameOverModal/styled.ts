@@ -8,7 +8,7 @@ export const Container = styled(Box)`
   left: 50%;
   width: 400px;
   border: 2px solid #000;
-  padding: 4px;
+  padding: 16px;
   transform: translate(-50%, -50%);
 `;
 

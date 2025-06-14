@@ -84,12 +84,12 @@ export function findEndgameSequence(params: {
         break;
       }
 
-      currentRow += rowIncrement;
-      currentColumn += colIncrement;
       sequence.push({
         row: currentRow,
         column: currentColumn,
       });
+      currentRow += rowIncrement;
+      currentColumn += colIncrement;
     }
 
     if (sequence.length === 5) {

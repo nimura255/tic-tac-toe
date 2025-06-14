@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useGameStore, markCell, startGame } from '$features/game';
 import { Canvas } from './styled';
 import { VirtualStage } from './VirtualStage';
+import { subscribeToTouchEvents } from './utils';
 
 export function Board({ readonly }: { readonly?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,10 +15,18 @@ export function Board({ readonly }: { readonly?: boolean }) {
     }
 
     const virtualStage = new VirtualStage(canvas);
+    let endgameSequence = useGameStore.getState().endgameSequence;
+
+    if (endgameSequence?.length) {
+      virtualStage.jumpToCell(
+        endgameSequence[2].column,
+        endgameSequence[2].row,
+      );
+    }
 
     const draw = () => {
       const board = useGameStore.getState().board;
-      virtualStage.draw(board);
+      virtualStage.draw(board, endgameSequence);
     };
 
     const handleWheelEvent = (event: WheelEvent) => {
@@ -56,15 +65,6 @@ export function Board({ readonly }: { readonly?: boolean }) {
       draw();
     };
 
-    const endgameSequence = useGameStore.getState().endgameSequence;
-
-    if (endgameSequence?.length) {
-      virtualStage.jumpToCell(
-        endgameSequence[2].column,
-        endgameSequence[2].row,
-      );
-    }
-
     draw();
 
     window.addEventListener('resize', handleResizeEvent);
@@ -77,6 +77,13 @@ export function Board({ readonly }: { readonly?: boolean }) {
         requestAnimationFrame(draw);
       },
     );
+    const unsubscribeFromEndgameSequence = useGameStore.subscribe(
+      (state) => state.endgameSequence,
+      (state) => {
+        endgameSequence = state;
+      },
+    );
+
     const unsubscribeFromStartGameAction = startGame.subscribe(() => {
       virtualStage.jumpToCell(0, 0);
       draw();
@@ -89,56 +96,9 @@ export function Board({ readonly }: { readonly?: boolean }) {
       unsubscribeFromBoardState();
       unsubscribeFromStartGameAction();
       unsubscribeFromTouchEvents();
+      unsubscribeFromEndgameSequence();
     };
   }, [readonly]);
 
   return <Canvas ref={canvasRef} />;
-}
-
-function subscribeToTouchEvents(
-  element: HTMLElement,
-  callback: (deltaX: number, deltaY: number) => void,
-) {
-  let lastTouchCoords: { x: number; y: number } | null = null;
-
-  const handleTouchStart = (event: TouchEvent) => {
-    if (event.touches.length === 1) {
-      lastTouchCoords = {
-        x: event.touches[0].clientX,
-        y: event.touches[0].clientY,
-      };
-    }
-  };
-
-  const handleTouchMove = (event: TouchEvent) => {
-    event.preventDefault();
-
-    if (event.touches.length !== 1 || lastTouchCoords === null) {
-      return;
-    }
-
-    const currentX = event.touches[0].clientX;
-    const currentY = event.touches[0].clientY;
-
-    const deltaX = lastTouchCoords.x - currentX;
-    const deltaY = lastTouchCoords.y - currentY;
-
-    callback(deltaX, deltaY);
-
-    lastTouchCoords = { x: currentX, y: currentY };
-  };
-
-  const handleTouchEnd = () => {
-    lastTouchCoords = null;
-  };
-
-  element.addEventListener('touchstart', handleTouchStart);
-  element.addEventListener('touchmove', handleTouchMove);
-  element.addEventListener('touchend', handleTouchEnd);
-
-  return () => {
-    element.removeEventListener('touchstart', handleTouchStart);
-    element.removeEventListener('touchmove', handleTouchMove);
-    element.removeEventListener('touchend', handleTouchEnd);
-  };
 }

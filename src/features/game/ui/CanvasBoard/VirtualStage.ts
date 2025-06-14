@@ -23,7 +23,10 @@ export class VirtualStage {
     this.updateCanvasDimensions();
   }
 
-  public draw(board: BoardFigureType[][]) {
+  public draw(
+    board: BoardFigureType[][],
+    endgameSequence: { row: number; column: number }[] | null,
+  ) {
     const ctx = this.ctx;
     const rect = this.canvas.getBoundingClientRect();
     ctx.fillStyle = '#ecebeb';
@@ -50,7 +53,17 @@ export class VirtualStage {
           GRID_GAP_PX + x * (CELL_SIZE_PX + GRID_GAP_PX) + offsetX;
         const canvasY =
           GRID_GAP_PX + y * (CELL_SIZE_PX + GRID_GAP_PX) + offsetY;
-        this.drawCell(canvasX, canvasY);
+
+        const isInEndgameSequence = Boolean(
+          endgameSequence?.find((sequenceCoord) => {
+            return (
+              sequenceCoord.column === x + gridOffsetX &&
+              sequenceCoord.row === y + gridOffsetY
+            );
+          }),
+        );
+
+        this.drawCell(canvasX, canvasY, isInEndgameSequence ? 'gold' : 'white');
 
         const boardCell = board[y + gridOffsetY]?.[x + gridOffsetX];
 
@@ -144,8 +157,8 @@ export class VirtualStage {
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
-  private drawCell(x: number, y: number) {
-    this.ctx.fillStyle = 'white';
+  private drawCell(x: number, y: number, color = 'white') {
+    this.ctx.fillStyle = color;
     this.ctx.fillRect(x, y, CELL_SIZE_PX, CELL_SIZE_PX);
   }
 
